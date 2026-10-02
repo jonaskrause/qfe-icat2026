@@ -1,22 +1,13 @@
 """
-QFE Aligned Grid v2 - convergent, quantum-theory-aligned comparison
-
-Main fix relative to previous runs:
-- The plotted population mean can stay below 1 if the algorithm keeps exploratory individuals.
-- This version separates exploration and convergence phases.
-- QFE_UNITARY_FLOW applies parameter-shift gradient ascent to every individual and uses a
-  late-stage contraction schedule, so both best fidelity and mean fidelity can approach 1.
+QFE - Quantum Functional Evolution
 
 Modes:
 - RANDOM: random control.
 - FIDELITY_ONLY: classical genetic baseline using fidelity as score.
 - QFE_SCORE: fidelity plus functional information in selection.
-- QFE_UNITARY_FLOW: proposed method. Uses functional information to generate a variational
-  unitary-flow update through parameter-shift gradients.
+- QFE_UNITARY_FLOW: proposed method. Uses functional information to generate a variational unitary-flow update through parameter-shift gradients.
 
-The ansatz is explicitly GHZ-reachable:
-    Ry(pi/2) on q0, followed by CRY(pi) along the chain.
-The script checks this at startup.
+The ansatz is explicitly GHZ-reachable: Ry(pi/2) on q0, followed by CRY(pi) along the chain.
 """
 
 from __future__ import annotations
@@ -62,7 +53,7 @@ class Config:
     population: int = 40
     generations: int = 80
     seed: int = 0
-    output_dir: str = "qfe_aligned_v2_outputs"
+    output_dir: str = "qfe_outputs"
     modes: Tuple[str, ...] = ("FIDELITY_ONLY", "QFE_SCORE", "FLOW_ONLY", "GRADIENT_ONLY", "QFE_UNITARY_FLOW", "RANDOM")
 
     # GA baseline
@@ -95,7 +86,6 @@ class Config:
 
     # Parameter-shift cost control
     # Each individual has layers * n_qubits root/local angles plus layers*(n-1) ent angles.
-    # Full gradient is okay for small academic grids; use --fast-gradient for larger grids.
     fast_gradient: bool = False
     max_gradient_parameters: int = 24
 
@@ -283,12 +273,6 @@ def parameter_refs(ind: Individual) -> List[Tuple[str, Tuple[int, ...]]]:
 
 def objective_for_flow(f: float, gen: int, cfg: Config, fi_min: float, fi_max: float) -> float:
     """Local refinement objective used by QFE_UNITARY_FLOW.
-
-    Fidelity remains the primary task metric, while the Functional Information (FI)
-    surrogate is used as an adaptive shaping term. The previous implementation used
-    a fixed divisor (FI/40.0). This version replaces that magic constant with
-    generation-level min--max normalization, so the FI contribution is scaled
-    relative to the current population.
 
     Parameters
     ----------
