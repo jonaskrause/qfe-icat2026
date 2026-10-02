@@ -158,7 +158,3 @@ The citation can be updated with the final Springer CCIS volume, page range, and
 - **Rodrigo Pasti** — [rodrigo.pasti@pucpr.br](mailto:rodrigo.pasti@pucpr.br)
 
 Postgraduate Program in Smart and Sustainable Cities (PPGCIS), Pontifical Catholic University of Paraná (PUCPR), Curitiba, Brazil.
-
-## Repository
-
-<https://github.com/jonaskrause/icat2026>
